@@ -1,0 +1,6 @@
+com\gridnine\testing\models\FlightBuilder.class
+com\gridnine\testing\Main.class
+com\gridnine\testing\FilterFlight.class
+com\gridnine\testing\models\Segment.class
+com\gridnine\testing\models\EnumFilter.class
+com\gridnine\testing\models\Flight.class
