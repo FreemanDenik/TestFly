@@ -2,12 +2,15 @@ package com.gridnine.testing.models;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 /**
  * Bean that represents a flight segment.
  */
-public class Segment {
+public class Segment{
     private final LocalDateTime departureDate;
 
     private final LocalDateTime arrivalDate;

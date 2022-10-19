@@ -4,7 +4,7 @@ package com.gridnine.testing.models;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Flight {
+public class Flight{
     private final List<Segment> segments;
 
     public Flight(final List<Segment> segs) {

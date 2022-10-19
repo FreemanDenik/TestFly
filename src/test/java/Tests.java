@@ -60,20 +60,18 @@ public class Tests {
         long days = Duration.between(departureList.get(0).getSegments().get(0).getDepartureDate(), departureList.get(0).getSegments().get(0).getArrivalDate()).toDays();
         assertEquals(days, 4);
 
-
         List<Flight> arrivalList = filterFlight.filter(EnumFilter.ARRIVAL_BEFORE_DEPARTURE);
-
-        assertTrue(arrivalList.size() == 1);
+        assertTrue(arrivalList.size() == 2);
         assertTrue(arrivalList.get(0).getSegments().size() == 1);
         long hours = Duration.between(arrivalList.get(0).getSegments().get(0).getArrivalDate(), arrivalList.get(0).getSegments().get(0).getDepartureDate()).toHours();
         assertEquals(hours, 2);
 
         List<Flight> twoHoursList = filterFlight.filter(EnumFilter.STAY_TWO_MORE_HOURS);
         assertTrue(twoHoursList.size() == 1);
-        assertTrue(twoHoursList.get(0).getSegments().size() == 1);
+        assertTrue(twoHoursList.get(0).getSegments().size() == 4);
         long minutes = IntStream.range(0, twoHoursList.get(0).getSegments().size() - 1)
                 .mapToLong(i -> Duration.between(twoHoursList.get(0).getSegments().get(i).getArrivalDate(), twoHoursList.get(0).getSegments().get(i + 1).getDepartureDate()).toMinutes())
                 .sum();
-        assertEquals(minutes, 623);
+        assertEquals(minutes, 213);
     }
 }

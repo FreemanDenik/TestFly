@@ -54,9 +54,11 @@ public final class FilterFlight {
     public List<Flight> filter(final EnumFilter... filters) {
         List<Predicate<Flight>> predicates = predicateMap.entrySet().stream()
                 .filter(w -> Arrays.stream(filters).anyMatch(t -> t.equals(w.getKey())))
-
                 .map(w -> w.getValue())
                 .collect(Collectors.toList());
+        Predicate predicate = predicateBuilder(predicates.get(0), predicates.stream().skip(1).toList());
+
+
         filter = flights.stream()
                 .filter(predicateBuilder(predicates.get(0), predicates.stream().skip(1).toList())).toList();
         return filter;
