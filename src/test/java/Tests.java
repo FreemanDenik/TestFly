@@ -1,8 +1,5 @@
 import com.gridnine.testing.FilterFlight;
-import com.gridnine.testing.models.EnumFilter;
-import com.gridnine.testing.models.Flight;
-import com.gridnine.testing.models.FlightBuilder;
-import com.gridnine.testing.models.Segment;
+import com.gridnine.testing.models.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +38,7 @@ public class Tests {
                         new Segment(now, now.plusHours(1)),
                         new Segment(now.plusHours(1), now.plusHours(3)),
                         new Segment(now.plusHours(4).plusMinutes(10), now.plusHours(6)),
-                        new Segment(now.plusHours(8).plusMinutes(23), now.plusHours(9)))
+                        new Segment(now.plusHours(8).plusMinutes(23), now.plusHours(8)))
                 )
         );
         try (MockedStatic<FlightBuilder> utilities = Mockito.mockStatic(FlightBuilder.class)) {
@@ -61,7 +58,7 @@ public class Tests {
         assertEquals(days, 4);
 
         List<Flight> arrivalList = filterFlight.filter(EnumFilter.ARRIVAL_BEFORE_DEPARTURE);
-        assertTrue(arrivalList.size() == 1);
+        assertTrue(arrivalList.size() == 2);
         assertTrue(arrivalList.get(0).getSegments().size() == 1);
         long hours = Duration.between(arrivalList.get(0).getSegments().get(0).getArrivalDate(), arrivalList.get(0).getSegments().get(0).getDepartureDate()).toHours();
         assertEquals(hours, 2);

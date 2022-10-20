@@ -12,36 +12,25 @@ import java.util.stream.IntStream;
 import static com.gridnine.testing.models.EnumFilter.*;
 
 public final class FilterFlight {
-    private final List<Flight> flights;
+    private List<Flight> flights;
     private List<Flight> filter;
-
-    public List<Flight> getFilter() {
-        return filter;
-    }
-
-    private final Map<EnumFilter, Predicate<Flight>> predicateMap;
+    private Map<EnumFilter, Tuple<?>> predicateMap;
 
     public FilterFlight(List<Flight> flights) {
+        this.filter = new ArrayList<>();
+
         // Подгружаем все рейсы
         this.flights = flights;
-
-        // Создаем правила
         predicateMap = new HashMap<>(Map.of(
                 // Вылети до текущего момента
-                DEPARTURE_BEFORE_NOW, x -> x.getSegments()
-                        .stream()
-                        .anyMatch(y -> y.getDepartureDate().isBefore(LocalDateTime.now())),
+                DEPARTURE_BEFORE_NOW, new Tuple<>(Segment.class, x -> x.getDepartureDate().isBefore(LocalDateTime.now())),
                 // Прилет раньше вылета
-
-//                // Прилет раньше вылета
-                ARRIVAL_BEFORE_DEPARTURE, x -> x.getSegments()
-                        .stream()
-                        .anyMatch(y -> y.getArrivalDate().isBefore(y.getDepartureDate())),
+                ARRIVAL_BEFORE_DEPARTURE, new Tuple<>(Segment.class, x -> x.getArrivalDate().isBefore(x.getDepartureDate())),
                 // Простой на земле больше 2 часов
-                STAY_TWO_MORE_HOURS, x -> IntStream
+                STAY_TWO_MORE_HOURS, new Tuple<>(Flight.class, x -> IntStream
                         .range(0, x.getSegments().size() - 1)
                         .mapToLong(i -> Duration.between(x.getSegments().get(i).getArrivalDate(), x.getSegments().get(i + 1).getDepartureDate()).toHours())
-                        .sum() > 2
+                        .sum() > 2)
         ));
     }
 
@@ -51,19 +40,23 @@ public final class FilterFlight {
      * @param filters
      * @return
      */
-    public List<Flight> filter(final EnumFilter... filters) {
-        List<Predicate<Flight>> predicates = predicateMap.entrySet().stream()
-                .filter(w -> Arrays.stream(filters).anyMatch(t -> t.equals(w.getKey())))
-                .map(w -> w.getValue())
-                .collect(Collectors.toList());
-        Predicate predicate = predicateBuilder(predicates.get(0), predicates.stream().skip(1).toList());
-
-
-        filter = flights.stream()
-                .filter(predicateBuilder(predicates.get(0), predicates.stream().skip(1).toList())).toList();
+    public List<Flight> filter(final EnumFilter filters) {
+        Tuple predicate = predicateMap.get(filters);
+        if (predicate.getFirst() == Flight.class) {
+            filter = flights.stream()
+                    .filter(predicate.getSecond()).toList();
+        } else if (predicate.getFirst() == Segment.class) {
+            filter.clear();
+            flights.forEach(fl -> {
+                if (fl.getSegments().stream().anyMatch(predicate.getSecond())) {
+                    filter.add(new Flight(fl.getSegments().stream().filter(predicate.getSecond()).toList()));
+                }
+            });
+        }
         return filter;
     }
-    public String toString(){
+
+    public String toString() {
         StringBuilder result = new StringBuilder();
         filter.stream()
                 .map(m -> result.append(m))
@@ -71,31 +64,5 @@ public final class FilterFlight {
                 .collect(Collectors.joining(" "));
         return result.toString();
     }
-//    public String filter1(final EnumFilter... filters) {
-//        StringBuilder result = new StringBuilder();
-//        var predicates = predicateMap.entrySet().stream()
-//                .filter(w -> Arrays.stream(filters).anyMatch(t -> t.equals(w.getKey())))
-//                .map(w -> w.getValue())
-//                .collect(Collectors.toList());
-//        flights.stream()
-//                .filter(predicateBuilder(predicates.get(0), predicates.stream().skip(1).toList()))
-//                .map(m -> result.append(m))
-//                .map(m -> result.append("\n"))
-//                .collect(Collectors.joining(" "));
-//        return result.toString();
-//    }
 
-    /**
-     * Рекурсивный строитель цепочки условия фильтрации, через OR
-     *
-     * @param result
-     * @param predicates
-     * @return
-     */
-    private Predicate predicateBuilder(Predicate result, List<? extends Predicate> predicates) {
-        return
-                predicates.size() >= 1 ?
-                        predicateBuilder(result.or(predicates.get(0)), predicates.stream().skip(1).toList()) :
-                        result;
-    }
 }
