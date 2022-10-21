@@ -1,15 +1,25 @@
 package com.gridnine.testing;
 
-import com.gridnine.testing.models.FlightBuilder;
+import com.gridnine.testing.data.Flight;
+import com.gridnine.testing.data.FlightBuilder;
+import com.gridnine.testing.data.Segment;
+import com.gridnine.testing.models.FlightFilter;
+import com.gridnine.testing.models.Rule;
 
-import static com.gridnine.testing.models.EnumFilter.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.IntStream;
+
+import static com.gridnine.testing.enums.EmRules.*;
 
 public class Main {
-    private static final FilterFlight flights = new FilterFlight(FlightBuilder.createFlights());
+    private static final FlightFilter flights = new FlightFilter(FlightBuilder.createFlights());
 
     public static void main(String[] args) {
 
-        System.out.println("\nВылети до текущего момента");
+        System.out.println("\nВылет до текущего момента");
         flights.filter(DEPARTURE_BEFORE_NOW);
         System.out.println(flights);
 

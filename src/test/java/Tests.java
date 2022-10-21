@@ -1,27 +1,27 @@
-import com.gridnine.testing.FilterFlight;
-import com.gridnine.testing.models.*;
+import com.gridnine.testing.models.FlightFilter;
+import com.gridnine.testing.enums.EmRules;
+import com.gridnine.testing.data.Flight;
+import com.gridnine.testing.data.FlightBuilder;
+import com.gridnine.testing.data.Segment;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class Tests {
 
 
-    FilterFlight filterFlight;
+    FlightFilter flightFilter;
 
     @BeforeAll
     public void init() {
@@ -43,27 +43,40 @@ public class Tests {
         );
         try (MockedStatic<FlightBuilder> utilities = Mockito.mockStatic(FlightBuilder.class)) {
             utilities.when(FlightBuilder::createFlights).thenReturn(flightList);
-            filterFlight = new FilterFlight(FlightBuilder.createFlights());
+            flightFilter = new FlightFilter(FlightBuilder.createFlights());
         }
 
     }
 
     @Test
-    public void test1() {
+    public void add_false_rule() {
+        int size = flightFilter.getPredicateMap().size();
+        flightFilter.addRule(EmRules.DEPARTURE_BEFORE_NOW, Segment.class, x -> true);
+        assertEquals(flightFilter.getPredicateMap().size(), size);
 
-        List<Flight> departureList = filterFlight.filter(EnumFilter.DEPARTURE_BEFORE_NOW);
+    }
+
+    @Test
+    public void departure_before_now() {
+        List<Flight> departureList = flightFilter.filter(EmRules.DEPARTURE_BEFORE_NOW);
         assertTrue(departureList.size() == 1);
         assertTrue(departureList.get(0).getSegments().size() == 1);
         long days = Duration.between(departureList.get(0).getSegments().get(0).getDepartureDate(), departureList.get(0).getSegments().get(0).getArrivalDate()).toDays();
         assertEquals(days, 4);
+    }
 
-        List<Flight> arrivalList = filterFlight.filter(EnumFilter.ARRIVAL_BEFORE_DEPARTURE);
+    @Test
+    public void arrival_before_departure() {
+        List<Flight> arrivalList = flightFilter.filter(EmRules.ARRIVAL_BEFORE_DEPARTURE);
         assertTrue(arrivalList.size() == 2);
-        assertTrue(arrivalList.get(0).getSegments().size() == 1);
+        assertTrue(arrivalList.get(1).getSegments().size() == 1);
         long hours = Duration.between(arrivalList.get(0).getSegments().get(0).getArrivalDate(), arrivalList.get(0).getSegments().get(0).getDepartureDate()).toHours();
         assertEquals(hours, 2);
+    }
 
-        List<Flight> twoHoursList = filterFlight.filter(EnumFilter.STAY_TWO_MORE_HOURS);
+    @Test
+    public void stay_two_more_hours() {
+        List<Flight> twoHoursList = flightFilter.filter(EmRules.STAY_TWO_MORE_HOURS);
         assertTrue(twoHoursList.size() == 1);
         assertTrue(twoHoursList.get(0).getSegments().size() == 4);
         long minutes = IntStream.range(0, twoHoursList.get(0).getSegments().size() - 1)
