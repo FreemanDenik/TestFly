@@ -2,6 +2,7 @@ package com.gridnine.testing.models;
 
 import java.util.function.Predicate;
 
+
 public class Tuple<F> {
     private Class first;
     private Predicate<F> second;
@@ -15,15 +16,12 @@ public class Tuple<F> {
         return first;
     }
 
-    public void setFirst(Class first) {
-        this.first = first;
-    }
-
     public Predicate<F> getSecond() {
         return second;
     }
-
-    public void setSecond(Predicate<F> second) {
-        this.second = second;
+    class Builder{
+        Builder(Class f){
+            first = f;
+        }
     }
 }

@@ -5,22 +5,22 @@ import com.gridnine.testing.models.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.gridnine.testing.models.EnumFilter.*;
 
 public final class FilterFlight {
-    private List<Flight> flights;
+    private final List<Flight> flights;
     private List<Flight> filter;
-    private Map<EnumFilter, Tuple<?>> predicateMap;
+    private final Map<EnumFilter, Tuple<?>> predicateMap;
 
     public FilterFlight(List<Flight> flights) {
         this.filter = new ArrayList<>();
 
         // Подгружаем все рейсы
         this.flights = flights;
+
         predicateMap = new HashMap<>(Map.of(
                 // Вылети до текущего момента
                 DEPARTURE_BEFORE_NOW, new Tuple<>(Segment.class, x -> x.getDepartureDate().isBefore(LocalDateTime.now())),
@@ -36,9 +36,6 @@ public final class FilterFlight {
 
     /**
      * Фильтруем рейсы по указанным предикатам
-     *
-     * @param filters
-     * @return
      */
     public List<Flight> filter(final EnumFilter filters) {
         Tuple predicate = predicateMap.get(filters);

@@ -1,18 +1,8 @@
 package com.gridnine.testing;
 
-import com.gridnine.testing.models.EnumFilter;
-import com.gridnine.testing.models.EnumFlightState;
-import com.gridnine.testing.models.Flight;
 import com.gridnine.testing.models.FlightBuilder;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.function.Predicate;
-import java.util.stream.IntStream;
-
 import static com.gridnine.testing.models.EnumFilter.*;
-import static com.gridnine.testing.models.EnumFlightState.FLIGHT;
-import static com.gridnine.testing.models.EnumFlightState.SEGMENT;
 
 public class Main {
     private static final FilterFlight flights = new FilterFlight(FlightBuilder.createFlights());
