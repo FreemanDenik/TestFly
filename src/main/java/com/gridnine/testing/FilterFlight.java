@@ -17,7 +17,6 @@ public final class FilterFlight {
 
     public FilterFlight(List<Flight> flights) {
         this.filter = new ArrayList<>();
-
         // Подгружаем все рейсы
         this.flights = flights;
 
@@ -38,15 +37,16 @@ public final class FilterFlight {
      * Фильтруем рейсы по указанным предикатам
      */
     public List<Flight> filter(final EnumFilter filters) {
-        Tuple predicate = predicateMap.get(filters);
-        if (predicate.getFirst() == Flight.class) {
+        Tuple tuple = predicateMap.get(filters);
+
+        if (tuple.compare(Flight.class)) {
             filter = flights.stream()
-                    .filter(predicate.getSecond()).toList();
-        } else if (predicate.getFirst() == Segment.class) {
+                    .filter(tuple.getPredicate()).toList();
+        } else if (tuple.compare(Segment.class)) {
             filter.clear();
             flights.forEach(fl -> {
-                if (fl.getSegments().stream().anyMatch(predicate.getSecond())) {
-                    filter.add(new Flight(fl.getSegments().stream().filter(predicate.getSecond()).toList()));
+                if (fl.getSegments().stream().anyMatch(tuple.getPredicate())) {
+                    filter.add(new Flight(fl.getSegments().stream().filter(tuple.getPredicate()).toList()));
                 }
             });
         }

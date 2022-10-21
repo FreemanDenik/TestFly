@@ -1,27 +1,24 @@
 package com.gridnine.testing.models;
 
+import lombok.EqualsAndHashCode;
+
 import java.util.function.Predicate;
 
 
 public class Tuple<F> {
-    private Class first;
-    private Predicate<F> second;
+    private Class<F> type;
+    private Predicate<F> predicate;
 
-    public Tuple(Class<F> first, Predicate<F> second) {
-        this.first = first;
-        this.second = second;
+    public Tuple(Class<F> type, Predicate<F> predicate) {
+        this.type = type;
+        this.predicate = predicate;
+    }
+    public boolean compare(Class<?> clazz) {
+        return type == clazz;
     }
 
-    public Class getFirst() {
-        return first;
+    public Predicate<F> getPredicate() {
+        return predicate;
     }
 
-    public Predicate<F> getSecond() {
-        return second;
-    }
-    class Builder{
-        Builder(Class f){
-            first = f;
-        }
-    }
 }
